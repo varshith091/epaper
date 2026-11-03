@@ -1,0 +1,227 @@
+/**
+ * Generates and triggers a beautifully formatted, print-ready UPSC / Competitive Exam Study Sheet PDF.
+ */
+export function generateStudySheetPDF(params: {
+  headline: string;
+  category: string;
+  sentiment: string;
+  entities: string[];
+  content: string;
+  summary?: string;
+  examNotes?: string;
+  quiz?: string;
+}) {
+  const printWindow = window.open("", "_blank");
+  if (!printWindow) {
+    alert("Please allow popups to download your Study Sheet PDF.");
+    return;
+  }
+
+  const dateStr = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>UPSC Study Sheet - ${params.headline.substring(0, 40)}</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 15mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #0f172a;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      background: #ffffff;
+    }
+    .header-banner {
+      border-bottom: 3px solid #d9232d;
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .logo-text {
+      font-size: 24px;
+      font-weight: 900;
+      font-family: Georgia, serif;
+      color: #d9232d;
+    }
+    .sub-text {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .meta-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+    .badge-cat {
+      background: #0f172a;
+      color: white;
+    }
+    .badge-sent {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+    }
+    .entities {
+      color: #2563eb;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    h1.headline {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.35;
+      margin: 0 0 16px 0;
+    }
+    .section-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #2563eb;
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin-bottom: 18px;
+    }
+    .section-card.exam {
+      border-left-color: #7e22ce;
+      background: #faf5ff;
+    }
+    .section-card.quiz {
+      border-left-color: #d97706;
+      background: #fffbeb;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 0 0 8px 0;
+      color: #0f172a;
+    }
+    pre {
+      white-space: pre-wrap;
+      font-family: inherit;
+      font-size: 13.5px;
+      line-height: 1.6;
+      margin: 0;
+      color: #334155;
+    }
+    .footer {
+      border-top: 1px solid #e2e8f0;
+      margin-top: 30px;
+      padding-top: 10px;
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+    }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header-banner">
+    <div>
+      <div class="logo-text">AI e-Paper | UPSC & Competitive Exam Brief</div>
+      <div class="sub-text">Special Daily Current Affairs Study Dossier</div>
+    </div>
+    <div style="text-align: right; font-size: 12px; color: #64748b; font-weight: 600;">
+      ${dateStr}
+    </div>
+  </div>
+
+  <div class="meta-row">
+    <span class="badge badge-cat">${params.category}</span>
+    <span class="badge badge-sent">Tone: ${params.sentiment}</span>
+    <span class="entities">${params.entities.join(" ")}</span>
+  </div>
+
+  <h1 class="headline">${params.headline}</h1>
+
+  ${
+    params.summary
+      ? `
+    <div class="section-card">
+      <div class="section-title">📌 Executive Summary & Key Highlights</div>
+      <pre>${params.summary}</pre>
+    </div>
+  `
+      : ""
+  }
+
+  ${
+    params.examNotes
+      ? `
+    <div class="section-card exam">
+      <div class="section-title" style="color: #7e22ce;">📚 UPSC Syllabus Linkages & Exam Notes</div>
+      <pre>${params.examNotes}</pre>
+    </div>
+  `
+      : ""
+  }
+
+  ${
+    params.quiz
+      ? `
+    <div class="section-card quiz">
+      <div class="section-title" style="color: #b45309;">📝 High-Yield Revision Quiz Questions</div>
+      <pre>${params.quiz}</pre>
+    </div>
+  `
+      : ""
+  }
+
+  <div class="section-card" style="border-left-color: #64748b; background: #ffffff;">
+    <div class="section-title">📰 Full News Context</div>
+    <div style="font-size: 13.5px; color: #334155; line-height: 1.7;">
+      ${params.content}
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Generated by Smart AI e-Paper Platform</span>
+    <span>Save as PDF via Print Dialog (Ctrl+P / Cmd+P)</span>
+  </div>
+
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+      }, 400);
+    };
+  </script>
+</body>
+</html>
+  `;
+
+  printWindow.document.open();
+  printWindow.document.write(html);
+  printWindow.document.close();
+}
